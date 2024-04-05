@@ -8,6 +8,14 @@ This repo contains just the neovim client. The server implementation can be foun
 
 ## Installation
 
+**Requirements:** Nodejs
+
+First install the websocket-text-relay language server
+
+```
+npm install --global websocket-text-relay
+```
+
 websocket-text-relay.nvim can be installed using [lazy.nvim](https://github.com/rockerBOO/lazy.nvim).
 
 Add the following line to your Neovim configuration to install websocket-text-relay.nvim:
@@ -22,8 +30,8 @@ require('lazy').setup {
 
 ## Usage
 
-After installation and configuration, continue with step 2 in the [websocket-text-relay README](https://github.com/niels4/websocket-text-relay)
-to connect a client and see your updates rendered live.
+After installation, continue with step 2 in the [websocket-text-relay README](https://github.com/niels4/websocket-text-relay)
+to connect your editor to a front end client and see your updates rendered as you type.
 
 ## License
 
