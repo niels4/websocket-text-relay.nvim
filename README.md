@@ -23,12 +23,14 @@ Add the following line to your Neovim configuration to install websocket-text-re
 ```lua
 require('lazy').setup {
 
-  {'niels4/websocket-text-relay.nvim', config = true}
+  { 'niels4/websocket-text-relay.nvim', opts = {} }
 
 }
 ```
 
 ## Usage
+
+Verify the plugin is working by viewing the status UI hosted at [http://localhost:38378](http://localhost:38378)
 
 After installation, continue with step 2 in the [websocket-text-relay README](https://github.com/niels4/websocket-text-relay)
 to connect your editor to a front end client and see your updates rendered as you type.
