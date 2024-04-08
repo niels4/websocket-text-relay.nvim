@@ -64,6 +64,7 @@ M.setup = function(options)
   options = options or {}
   lsp_config.cmd = options.cmd or lsp_config.cmd
   lsp_config.init_options.allowedHosts = options.allowed_hosts
+  lsp_config.init_options.allowNetworkAccess = options.allow_network_access
   simple_lsp_client.start(lsp_config)
 
   local augroup = vim.api.nvim_create_augroup("WebsocketTextRelay", { clear = true })
