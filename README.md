@@ -63,7 +63,7 @@ to allow other hosts to connect to the websocket server, you must explicitly all
 ```
 
 You can override the command used to start the language server using the `cmd` option. This is useful for local
-development and debugging the application using the chrome debugger. See the [develoeprs guide](https://github.com/niels4/websocket-text-relay/blob/main/docs/dev-getting-started.md) for more information.
+development and debugging the application using the chrome debugger. See the [developer's guide](https://github.com/niels4/websocket-text-relay/blob/main/docs/dev-getting-started.md) for more information.
 
 ```lua
 
