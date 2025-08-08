@@ -49,6 +49,7 @@ end
 local update_open_file_list = function()
 	local files = get_all_buffer_names()
 	simple_lsp_client.send_file_open_notification(files)
+	update_all_buf_watchers()
 end
 
 lsp_config.handlers = {
