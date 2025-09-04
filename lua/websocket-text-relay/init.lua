@@ -63,11 +63,18 @@ lsp_config.handlers = {
 	end,
 }
 
+local is_valid_updates_per_second = function(updates_per_second)
+	return type(updates_per_second) == "number" and updates_per_second >= 0.1 and updates_per_second <= 100
+end
+
 M.setup = function(options)
 	options = options or {}
 	lsp_config.cmd = options.cmd or lsp_config.cmd
 	lsp_config.init_options.allowedHosts = options.allowed_hosts
 	lsp_config.init_options.allowNetworkAccess = options.allow_network_access
+	if is_valid_updates_per_second(options.updates_per_second) then
+		lsp_config.flags.debounce_text_changes = math.floor(1000 / options.updates_per_second)
+	end
 	simple_lsp_client.start(lsp_config)
 
 	local augroup = vim.api.nvim_create_augroup("WebsocketTextRelay", { clear = true })
