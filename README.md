@@ -44,6 +44,8 @@ to connect your editor to a front end client and see your updates rendered as yo
 
 ## configuration
 
+### allow_network_access
+
 By default, the http and websocket server will only accept incoming connections from your local machine. If you
 wish to allow network access you must set the `allow_network_access` option to true.
 
@@ -53,6 +55,8 @@ wish to allow network access you must set the `allow_network_access` option to t
   }},
 ```
 
+### allowed_hosts
+
 By default, the http and websocket server will only accept connections where the hostname is `localhost`. If you wish
 to allow other hosts to connect to the websocket server, you must explicitly allow them using the `allowed_hosts` option.
 
@@ -61,6 +65,8 @@ to allow other hosts to connect to the websocket server, you must explicitly all
       allowed_hosts = { "some-allowed-host.test", "some-other-host.test" },
   }},
 ```
+
+### cmd
 
 You can override the command used to start the language server using the `cmd` option. This is useful for local
 development and debugging the application using the chrome debugger. See the [developer's guide](https://github.com/niels4/websocket-text-relay/blob/main/docs/dev-getting-started.md) for more information.
@@ -77,6 +83,19 @@ require('lazy').setup {
 
 }
 
+```
+
+### updates_per_second
+
+You can use the `updates_per_second` option to override the default update rate of the LSP client. As of September 2025, it seems that the max updates per second that neovim
+will send to the LSP server is 30. That is the default setting for websocket-text-relay, if you wish to send updates at a lower rate
+you can reduce the value in the config.
+
+
+```lua
+  { 'niels4/websocket-text-relay.nvim', opts = {
+      updates_per_second = 30
+  }},
 ```
 
 ## License
