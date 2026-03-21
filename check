@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -eu
+
+lua-language-server --check="." --configpath=".luarc.json" --checklevel="Hint" 2>/dev/null
