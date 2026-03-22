@@ -1,11 +1,10 @@
+local actions = require('websocket-text-relay.wtr-actions')
 local options = require('websocket-text-relay.options')
 local opts = options.opts
 
-local lsp_name = 'websocket_text_relay'
+local lsp_name = actions.lsp_name
 
 local M = {}
-
-M.lsp_name = lsp_name
 
 M.get_config = function()
   ---@diagnostic disable-next-line: assign-type-mismatch
@@ -27,6 +26,9 @@ M.get_config = function()
     on_init = function()
       vim.notify('wtr init', vim.log.levels.INFO)
     end,
+    handlers = {
+      ['wtr/update-active-files'] = actions.update_active_files,
+    },
   }
 end
 

@@ -1,4 +1,5 @@
 local options = require('websocket-text-relay.options')
+local wtr = require('websocket-text-relay.wtr-client')
 
 local M = {}
 
@@ -8,7 +9,7 @@ M.setup = function(user_opts)
   options.set_opts(user_opts)
 
   if user_opts.enabled then
-    vim.notify('WTR Enabled', vim.log.levels.INFO)
+    wtr.enable()
   end
 end
 

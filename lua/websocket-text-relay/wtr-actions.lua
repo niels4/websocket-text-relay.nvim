@@ -1,8 +1,10 @@
 local util = require('websocket-text-relay.util')
-local lsp_config = require('websocket-text-relay.lsp-config')
-local lsp_name = lsp_config.lsp_name
 
+local lsp_name = 'websocket_text_relay'
+
+---@type vim.lsp.Client | nil
 local client
+---@type table<string, boolean>
 local open_files = {}
 
 local send_open_files0 = function()
@@ -13,7 +15,7 @@ local send_open_files0 = function()
   local params = {
     files = vim.tbl_keys(open_files),
   }
-  client.notify('wtr/update-open-files', params)
+  client:notify('wtr/update-open-files', params)
 end
 
 local send_open_files = util.debounce(send_open_files0, 50)
@@ -50,14 +52,17 @@ local augroup = vim.api.nvim_create_augroup('WebsocketTextRelay', { clear = true
 
 local M = {}
 
-M.enable = function()
-  local client_id = vim.lsp.start(lsp_config.get_config())
+M.lsp_name = lsp_name
+
+---@param lsp_config vim.lsp.Config
+M.start_client = function(lsp_config)
+  local client_id = vim.lsp.start(lsp_config)
   assert(client_id, 'Could not start lsp for WTR')
   client = vim.lsp.get_client_by_id(client_id)
   vim.lsp.enable(lsp_name)
 
   reset_open_files()
-  send_open_files0()
+  send_open_files()
 
   vim.api.nvim_create_autocmd('BufAdd', {
     group = augroup,
@@ -68,23 +73,20 @@ M.enable = function()
     group = augroup,
     callback = on_remove_file,
   })
-
-  vim.notify('WTR Enabled')
 end
 
-M.disable = function()
+M.stop_client = function()
+  if client == nil then
+    return
+  end
   client = nil
   vim.lsp.enable(lsp_name, false)
   vim.api.nvim_clear_autocmds({ group = augroup })
-  vim.notify('WTR disabled')
 end
 
-M.toggle = function()
-  if vim.lsp.is_enabled(lsp_name) then
-    M.disable()
-  else
-    M.enable()
-  end
+M.update_active_files = function(_, params)
+  print('Got active files!')
+  P(params.files)
 end
 
 return M
