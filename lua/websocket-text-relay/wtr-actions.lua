@@ -4,8 +4,33 @@ local lsp_name = 'websocket_text_relay'
 
 ---@type vim.lsp.Client | nil
 local client
+
 ---@type table<string, boolean>
 local open_files = {}
+
+---@type table<string, boolean>
+local active_files = {}
+
+local update_buf_watcher = function(buf)
+  local file = vim.api.nvim_buf_get_name(buf)
+  if file == '' or client == nil then
+    return
+  end
+  local should_attach = active_files[file]
+  local is_attached = vim.lsp.buf_is_attached(buf, client.id)
+  if should_attach and not is_attached then
+    vim.lsp.buf_attach_client(buf, client.id)
+  elseif is_attached and not should_attach then
+    vim.lsp.buf_detach_client(buf, client.id)
+  end
+end
+
+local update_all_buf_watchers = function()
+  local bufs = vim.api.nvim_list_bufs()
+  for _, buf in ipairs(bufs) do
+    update_buf_watcher(buf)
+  end
+end
 
 local send_open_files0 = function()
   if client == nil then
@@ -31,21 +56,27 @@ local reset_open_files = function()
 end
 
 local on_new_file = function(ev)
-  local name = ev.file
+  local name = vim.api.nvim_buf_get_name(ev.buf)
   if #name == 0 or not vim.bo[ev.buf].buflisted then
     return
   end
-  open_files[name] = true
-  send_open_files()
+  if not open_files[name] then
+    open_files[name] = true
+    send_open_files()
+  end
+  update_buf_watcher(ev.buf)
 end
 
 local on_remove_file = function(ev)
-  local name = ev.file
+  local name = vim.api.nvim_buf_get_name(ev.buf)
   if #name == 0 or not vim.bo[ev.buf].buflisted then
     return
   end
-  open_files[name] = nil
-  send_open_files()
+  if open_files[name] then
+    open_files[name] = nil
+    send_open_files()
+  end
+  update_buf_watcher(ev.buf)
 end
 
 local augroup = vim.api.nvim_create_augroup('WebsocketTextRelay', { clear = true })
@@ -64,7 +95,7 @@ M.start_client = function(lsp_config)
   reset_open_files()
   send_open_files()
 
-  vim.api.nvim_create_autocmd('BufAdd', {
+  vim.api.nvim_create_autocmd('BufRead', {
     group = augroup,
     callback = on_new_file,
   })
@@ -85,8 +116,11 @@ M.stop_client = function()
 end
 
 M.update_active_files = function(_, params)
-  print('Got active files!')
-  P(params.files)
+  active_files = {}
+  for _, file in ipairs(params.files) do
+    active_files[file] = true
+  end
+  update_all_buf_watchers()
 end
 
 return M
