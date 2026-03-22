@@ -1,4 +1,4 @@
-local options = require 'websocket-text-relay.options'
+local options = require('websocket-text-relay.options')
 
 local M = {}
 

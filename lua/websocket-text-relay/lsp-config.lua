@@ -1,4 +1,4 @@
-local options = require 'websocket-text-relay.options'
+local options = require('websocket-text-relay.options')
 local opts = options.opts
 
 local lsp_name = 'websocket_text_relay'
