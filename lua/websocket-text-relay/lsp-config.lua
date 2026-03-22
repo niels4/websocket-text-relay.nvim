@@ -1,15 +1,33 @@
-local capabilities = vim.lsp.protocol.make_client_capabilities()
+local options = require 'websocket-text-relay.options'
+local opts = options.opts
 
-local DEFAULT_UPDATES_PER_SECOND = 31
+local lsp_name = 'websocket_text_relay'
 
-local server = {
-  cmd = { 'websocket-text-relay' },
-  name = 'websocket-text-relay',
-  capabilities = capabilities,
-  init_options = { label = 'websocket-text-relay' },
-  flags = {
-    debounce_text_changes = math.floor(1000 / DEFAULT_UPDATES_PER_SECOND),
-  },
-}
+local M = {}
 
-return server
+M.lsp_name = lsp_name
+
+M.get_config = function()
+  ---@diagnostic disable-next-line: assign-type-mismatch
+  local cmd = type(opts.cmd) == 'table' and opts.cmd or { opts.cmd } ---@type string[]
+
+  if vim.fn.executable(cmd[1]) == 0 then
+    vim.notify('WTR: Executable ' .. cmd[1] .. ' not found in PATH. Install with `npm install -g websocket-text-relay`', vim.log.levels.ERROR)
+  end
+
+  ---@type vim.lsp.Config
+  return {
+    name = lsp_name,
+    cmd = cmd,
+    init_options = { label = 'websocket-text-relay' },
+    flags = {
+      exit_timeout = 0,
+      debounce_text_changes = math.floor(1000 / opts.updates_per_second),
+    },
+    on_init = function()
+      vim.notify('wtr init', vim.log.levels.INFO)
+    end,
+  }
+end
+
+return M
