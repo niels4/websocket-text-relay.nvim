@@ -12,7 +12,9 @@
   "Lua.workspace.library": [
     "$VIMRUNTIME/lua",
     "$VIMRUNTIME/lua/vim",
-    "$VIMRUNTIME/lua/vim/lsp"
+    "$VIMRUNTIME/lua/vim/lsp",
+    "${3rd}/luv/library",
+    "${3rd}/busted/library"
   ],
   "Lua.workspace.checkThirdParty": false
 }
