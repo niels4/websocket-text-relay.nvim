@@ -18,31 +18,75 @@ npm install --global websocket-text-relay@latest
 
 ## Updating the Language Server
 
-If you already have installed the language server, you can run the same command again to update to the latest version (just be sure to include the `@latest` suffix)
+If the language server is already installed, you can run the same command again to update to the latest version.
 
 ## Install Neovim Plugin
 
 websocket-text-relay.nvim can be installed using [lazy.nvim](https://github.com/rockerBOO/lazy.nvim).
 
-Add the following line to your Neovim configuration to install websocket-text-relay.nvim:
+### With Lazy
+Add the following lines to your Neovim configuration to install websocket-text-relay.nvim and configure `<M-w>` to toggle the language server on and off:
 
 ```lua
 require('lazy').setup {
 
-  { 'niels4/websocket-text-relay.nvim', opts = {} }
+  { 'niels4/websocket-text-relay.nvim', 
+    keys = {
+      { mode = 'n', '<M-w>', '<cmd>WtrToggle<cr>', desc = '[w]tr toggle' },
+    },
+  }
 
 }
 ```
 
+### Without Lazy
+
+Use any package manager you like to install the plugin in the github repo `niels4/websocket-text-relay.nvim`
+
+Once installed 3 commands become available: `WtrToggle`, `WtrEnable`, and `WtrDisable`
+
+#### Map with standard keymap.set
+```lua
+vim.keymap.set('n', '<M-w>', '<cmd>WtrToggle<cr>', { 
+  desc = '[w]tr toggle',
+  silent = true 
+})
+```
+
 ## Usage
+
+Once the plugin is installed, enable it with your hotkey <M-w> or enter the command `:WtrEnable` to start the language server and websocket interface.
 
 Verify the plugin is working by viewing the status UI hosted at [http://localhost:38378](http://localhost:38378)
 
 After installation, continue with step 2 in the [websocket-text-relay README](https://github.com/niels4/websocket-text-relay)
 to connect your editor to a front end client and see your updates rendered as you type.
 
-
 ## configuration
+
+```lua
+---@class WtrOptions
+---@field enabled? boolean Enabled on startup?
+---@field allow_network_access? boolean Allow other computers on local network to access websocket interface.
+---@field allowed_hosts? string[] Similar to CORS. Choose which urls are allowed to connect to the websocket interface.
+---@field cmd? string|string[] The command to start the LSP. Can be a string or a list of strings.
+---@field updates_per_second? number How many times per second to sync text.
+
+
+---@param user_opts WtrOptions
+M.setup = function(user_opts)
+```
+
+### enabled
+
+By default, the language server is not enabled.
+Set the `enabled` option to true to start the language server and websocket interface when neovim starts.
+
+```lua
+  { 'niels4/websocket-text-relay.nvim', opts = {
+      enabled = true
+  }},
+```
 
 ### allow_network_access
 
@@ -57,12 +101,15 @@ wish to allow network access you must set the `allow_network_access` option to t
 
 ### allowed_hosts
 
-By default, the http and websocket server will only accept connections where the hostname is `localhost`. If you wish
-to allow other hosts to connect to the websocket server, you must explicitly allow them using the `allowed_hosts` option.
+This is similar to (CORS)[https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS]. But enforced server side.
+
+By default, the http and websocket server will only accept connections from a web browser where the hostname is `localhost`.
+If you wish visit another website and allow your browser to connect to the websocket interface, you must explicitly allow them using the `allowed_hosts` option.
+Only add hosts that you trust, as they will be able to the contents of any source files opened in your editor.
 
 ```lua
   { 'niels4/websocket-text-relay.nvim', opts = {
-      allowed_hosts = { "some-allowed-host.test", "some-other-host.test" },
+      allowed_hosts = { "niels4.github.io", "some-other-host.test" },
   }},
 ```
 

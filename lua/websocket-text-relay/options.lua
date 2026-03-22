@@ -2,10 +2,10 @@ local DEFAULT_UPDATES_PER_SECOND = 31
 
 ---@class WtrOptions
 ---@field enabled? boolean Enabled on startup?
+---@field allow_network_access? boolean Allow other computers on local network to access websocket interface.
+---@field allowed_hosts? string[] Similar to CORS. Choose which urls are allowed to connect to the websocket interface.
 ---@field cmd? string|string[] The command to start the LSP. Can be a string or a list of strings.
 ---@field updates_per_second? number How many times per second to sync text.
----@field allow_network_access? boolean
----@field allowed_hosts? string[]
 
 ---@class WtrOptionsInternal
 ---@field cmd string|string[]

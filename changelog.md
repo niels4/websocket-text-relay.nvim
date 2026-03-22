@@ -1,3 +1,24 @@
+## 1.2.0 - 2026/03/22
+
+Updated plugin to work with the new neovim lsp api in version 0.11.
+
+Plugin is now disabled by default. Add commands to easily enable or toggle.
+
+Override with a config or add keybinds to enable/toggle.
+
+#### With Lazy:
+```lua
+  { 'niels4/websocket-text-relay.nvim',
+    keys = {
+      { mode = 'n', '<M-w>', '<cmd>WtrToggle<cr>', desc = '[w]tr toggle' },
+    },
+    opts = {
+      enabled = true
+    }
+  },
+```
+
+
 ## 1.1.0 - 2024/04/07
 
 Increased default security.
