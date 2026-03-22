@@ -1,20 +1,42 @@
+local util = require('websocket-text-relay.util')
 local lsp_config = require('websocket-text-relay.lsp-config')
 local lsp_name = lsp_config.lsp_name
 
-local get_open_files = function()
-  local buf_names = {}
+local open_files = {}
+
+local send_open_files0 = function()
+  local files = vim.tbl_keys(open_files)
+  vim.notify('Relay synced: ' .. #files)
+end
+
+local send_open_files = util.debounce(send_open_files0, 50)
+
+local reset_open_files = function()
+  open_files = {}
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     local name = vim.api.nvim_buf_get_name(buf)
     if vim.bo[buf].buflisted and #name ~= 0 then
-      table.insert(buf_names, name)
+      open_files[name] = true
     end
   end
-  return buf_names
 end
 
-local update_open_file_list = function()
-  local files = get_open_files()
-  print('Updating files: ' .. vim.inspect(files))
+local on_new_file = function(ev)
+  local name = ev.file
+  if #name == 0 or not vim.bo[ev.buf].buflisted then
+    return
+  end
+  open_files[name] = true
+  send_open_files()
+end
+
+local on_remove_file = function(ev)
+  local name = ev.file
+  if #name == 0 or not vim.bo[ev.buf].buflisted then
+    return
+  end
+  open_files[name] = nil
+  send_open_files()
 end
 
 local augroup = vim.api.nvim_create_augroup('WebsocketTextRelay', { clear = true })
@@ -24,12 +46,17 @@ local M = {}
 M.enable = function()
   vim.lsp.start(lsp_config.get_config())
   vim.lsp.enable(lsp_name)
-  update_open_file_list()
+  reset_open_files()
+  send_open_files0()
 
-  vim.api.nvim_create_autocmd({ 'BufAdd', 'BufDelete', 'BufFilePost', 'BufWipeout' }, {
+  vim.api.nvim_create_autocmd('BufAdd', {
     group = augroup,
-    pattern = '*',
-    callback = update_open_file_list,
+    callback = on_new_file,
+  })
+
+  vim.api.nvim_create_autocmd({ 'BufDelete', 'BufWipeout' }, {
+    group = augroup,
+    callback = on_remove_file,
   })
 
   vim.notify('WTR Enabled')
