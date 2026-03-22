@@ -2,11 +2,18 @@ local util = require('websocket-text-relay.util')
 local lsp_config = require('websocket-text-relay.lsp-config')
 local lsp_name = lsp_config.lsp_name
 
+local client
 local open_files = {}
 
 local send_open_files0 = function()
-  local files = vim.tbl_keys(open_files)
-  vim.notify('Relay synced: ' .. #files)
+  if client == nil then
+    return
+  end
+
+  local params = {
+    files = vim.tbl_keys(open_files),
+  }
+  client.notify('wtr/update-open-files', params)
 end
 
 local send_open_files = util.debounce(send_open_files0, 50)
@@ -44,8 +51,11 @@ local augroup = vim.api.nvim_create_augroup('WebsocketTextRelay', { clear = true
 local M = {}
 
 M.enable = function()
-  vim.lsp.start(lsp_config.get_config())
+  local client_id = vim.lsp.start(lsp_config.get_config())
+  assert(client_id, 'Could not start lsp for WTR')
+  client = vim.lsp.get_client_by_id(client_id)
   vim.lsp.enable(lsp_name)
+
   reset_open_files()
   send_open_files0()
 
@@ -63,6 +73,7 @@ M.enable = function()
 end
 
 M.disable = function()
+  client = nil
   vim.lsp.enable(lsp_name, false)
   vim.api.nvim_clear_autocmds({ group = augroup })
   vim.notify('WTR disabled')
