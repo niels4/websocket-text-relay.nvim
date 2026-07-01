@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
+export VIMRUNTIME
+VIMRUNTIME=$(nvim --clean --headless -c 'lua io.stdout:write(vim.env.VIMRUNTIME)' -c 'qa!')
+
 lua-language-server --check="." --configpath=".luarc.json" --checklevel="Hint" 2>/dev/null
