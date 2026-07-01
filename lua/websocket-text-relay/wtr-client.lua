@@ -2,6 +2,7 @@ local actions = require('websocket-text-relay.wtr-actions')
 local lsp_config = require('websocket-text-relay.lsp-config')
 
 local M = {}
+local augroup = vim.api.nvim_create_augroup('WebsocketTextRelay-start', { clear = true })
 
 local last_enabled = 0
 local enabled = false
@@ -13,6 +14,7 @@ M.enable = function()
   last_enabled = os.time()
   actions.start_client(config)
   vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
+    group = augroup,
     callback = function()
       if enabled then
         actions.start_client(config)
@@ -36,10 +38,8 @@ M.toggle = function()
   end
 
   if enabled then
-    print('WTR TOggle disable')
     M.disable()
   else
-    print('WTR TOggle enable')
     M.enable()
   end
 end
