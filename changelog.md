@@ -1,3 +1,7 @@
+## 1.2.1 - 2026/06/30
+
+Fixed bug that caused the LSP client to fail to initialize if enabled on startup.
+
 ## 1.2.0 - 2026/03/22
 
 Updated plugin to work with the new neovim lsp api in version 0.11.
