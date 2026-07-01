@@ -40,6 +40,7 @@ local send_open_files0 = function()
   local params = {
     files = vim.tbl_keys(open_files),
   }
+  ---@diagnostic disable-next-line: param-type-mismatch -- Using custom notify action
   client:notify('wtr/update-open-files', params)
 end
 
@@ -85,8 +86,16 @@ local M = {}
 
 M.lsp_name = lsp_name
 
+M.started = false
+
 ---@param lsp_config vim.lsp.Config
 M.start_client = function(lsp_config)
+  local file_path = vim.api.nvim_buf_get_name(0)
+  if M.started or #file_path == 0 then
+    return
+  end
+  M.started = true
+
   local client_id = vim.lsp.start(lsp_config)
   assert(client_id, 'Could not start lsp for WTR')
   client = vim.lsp.get_client_by_id(client_id)
@@ -107,6 +116,7 @@ M.start_client = function(lsp_config)
 end
 
 M.stop_client = function()
+  M.started = false
   if client == nil then
     return
   end

@@ -4,7 +4,15 @@ local lsp_config = require('websocket-text-relay.lsp-config')
 local M = {}
 
 M.enable = function()
-  actions.start_client(lsp_config.get_config())
+  local config = lsp_config.get_config()
+
+  actions.start_client(config)
+  vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
+    callback = function()
+      actions.start_client(config)
+    end,
+  })
+
   vim.notify('WTR Enabled')
 end
 
